@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.utils.translation import ugettext as _
 from community.views import OwnedObject, FilterableList
 from .models import NewsArticle
@@ -64,3 +64,17 @@ class NewsArticleList(ListView, FilterableList):
     def get_queryset(self):
         queryset = NewsArticle.objects.filter(approve=True)
         return queryset
+
+
+class NewsModerate(DetailView):
+    model = NewsArticle
+    template_name = "news/_new_detail.html"
+
+    def get_object(self, queryset=None):
+        #import ipdb; ipdb.set_trace()
+        self.object=super(NewsModerate, self).get_object()
+        return self.object
+
+
+
+

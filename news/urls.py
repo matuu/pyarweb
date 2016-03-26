@@ -7,7 +7,8 @@ from .views import (
     NewsArticleDelete,
     NewsArticleList,
     NewsArticleUpdate,
-    NewsFeed
+    NewsFeed,
+    NewsModerate
 )
 
 
@@ -28,4 +29,7 @@ urlpatterns = patterns('',
                        url(r'^(?P<pk>\d+)/update/$',
                            login_required(NewsArticleUpdate.as_view()),
                            name='news_update'),
+                       url(r'^(?P<pk>\d+)/moderate$',
+                           NewsModerate.as_view(),
+                           name='news_moderate')
                        )

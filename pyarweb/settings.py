@@ -43,6 +43,11 @@ LOGIN_REDIRECT_URL = '/'
 DISQUS_API_KEY = '3t6eKCbxRGuIG3SmdHb8malOf1h2WxSYEfXbBjWyNBaFLMyD1GOIfWYFciqJqo69'
 DISQUS_WEBSITE_SHORTNAME = 'PyAr'
 
+# Telegram settings
+BOT_TOKEN = "205135924:AAHSY9ErCGExrk8cmlRqZalyovBE5pBhWNE"
+PYAR_GENERAL_CHANNEL = "@pythonargentina"
+PYAR_MODERATION_GROUP = -116468769
+
 
 # Application definition
 
@@ -62,6 +67,7 @@ INSTALLED_APPS = (
     'jobs',
     'events',
     'tutoring',
+    'telegrambot',
 
     # 3rd party apps
     'allauth',
@@ -69,9 +75,9 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     # ... include the providers you want to enable:
     # Ver esto mas adelante
-    #'allauth.socialaccount.providers.github',
-    #'allauth.socialaccount.providers.google',
-    #'allauth.socialaccount.providers.twitter',
+    # 'allauth.socialaccount.providers.github',
+    # 'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.twitter',
     'django_extensions',
     'disqus',
     'taggit',
@@ -93,7 +99,7 @@ INSTALLED_APPS = (
     'waliki.togetherjs',
     'kombu.transport.django',
     'djcelery'
-    #'waliki.pdf'
+    # 'waliki.pdf'
 )
 
 
