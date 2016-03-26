@@ -60,3 +60,7 @@ class NewsArticleUpdate(UpdateView, OwnedObject):
 class NewsArticleList(ListView, FilterableList):
     model = NewsArticle
     paginate_by = 10
+
+    def get_queryset(self):
+        queryset = NewsArticle.objects.filter(approve=True)
+        return queryset
