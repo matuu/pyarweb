@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.generic import View
+from .pyarbot import moderate
 
-# Create your views here.
+
+class BotMessage(View):
+
+    def get(self, request):
+        if request.method is "POST":
+            moderate(request)
+        return JsonResponse({"OK"})
+

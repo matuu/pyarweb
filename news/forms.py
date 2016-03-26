@@ -7,6 +7,7 @@ from .models import NewsArticle
 
 
 class NewsArticleForm(forms.ModelForm):
+
     """A PyAr news article form."""
 
     body = forms.CharField(widget=SummernoteInplaceWidget())
@@ -19,4 +20,4 @@ class NewsArticleForm(forms.ModelForm):
 
     class Meta:
         model = NewsArticle
-        exclude = ('approve', 'owner',)
+        exclude = ('approve', 'owner', 'ts_moderate', 'user_moderate')

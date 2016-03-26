@@ -1,11 +1,13 @@
-from pyarweb.settings import BOT_TOKEN, PYAR_GENERAL_CHANNEL, PYAR_MODERATION_GROUP
 import telegram
 from telegram.ext import Updater
 from parse import parse
+from django.conf import settings
+# from pyarweb.settings import BOT_TOKEN, PYAR_MODERATION_GROUP
+from news.models import NewsArticle
 
-bot = telegram.Bot(token=BOT_TOKEN)
+bot = telegram.Bot(token=settings.BOT_TOKEN)
 
-MODERATION_COMMANDS = ["ACEPTAR", "RECHAZAR"]
+MODERATION_COMMANDS = {"OK": True, "NO": False}
 
 
 def sendMessage(chat_id, text, parse_mode=None, disable_notification=False):
@@ -19,11 +21,16 @@ def sendMessage(chat_id, text, parse_mode=None, disable_notification=False):
                        "disable_notification": disable_notification})
 
 
-def moderatePost(request):
+def moderate(request):
     """Apply moderation and send result to Telegram Group."""
     update = telegram.Update.de_json(request.get_json(force=True))
     if(validateUpdateData(update)):
-        pass
+        id, username, object_type, text = parseText(update.message.reply_to_message.text)
+        if object_type == "News":
+            NewsArticle.objects.get(pk=id).moderate(MODERATION_COMMANDS[text],
+                                                    username)
+        # TODO Difundir noticia a traves del bot con sendMessage
+        # con chat_id = canal correspondiente
     else:
         bot.sendMessage(chat_id=update.message.chat.id,
                         text="Generic error for now")
@@ -35,7 +42,7 @@ def validateUpdateData(update):
 
     if update.message.chat.type != 'group':
         return False
-    if update.message.chat.id != PYAR_MODERATION_GROUP:
+    if update.message.chat.id != settings.PYAR_MODERATION_GROUP:
         return False
     if update.message.reply_to_message is not None:
         return False
@@ -45,21 +52,26 @@ def validateUpdateData(update):
     return True
 
 
-def parsePostToText(id_post, username, post_link):
-    """Create a text for Telegram message from a Pyar Post."""
+def parseToText(id_post, username, object_type, post_link):
+    """Create a text for Telegram message."""
 
-    return """*Nuevo Post en PyAr*
+    return """*Moderación en PyAr*
 _ID_: *{id_post}*
 _USER_: *{username}*
-_LINK_: {post_link}""".format(**{
+_TYPE_: *{object_type}*
+_LINK_: {post_link}
+*OK* | *NO*""".format(**{
                                 "id_post": id_post,
                                 "username": username,
+                                "object_type": object_type,
                                 "post_link": post_link})
 
 
-def parseTextToPost(text):
-    """Get a Post from de moderator reply"""
-    return parse('Nuevo Post en PyAr\n\
+def parseText(text):
+    """Get data from the moderator reply"""
+    return parse('Moderación en PyAr\n\
 ID: {}\n\
 USER: {}\n\
-LINK: {}', text)
+TYPE: {}\n\
+LINK: {}\n\
+OK | NO', text).fixed

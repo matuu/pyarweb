@@ -47,4 +47,5 @@ urlpatterns = patterns(
     url(r'^wiki/', include('waliki.urls')),
     url(r'^(pyar/)?(?P<slug>' + WALIKI_SLUG_PATTERN + ')/?',
         old_url_redirect, name='old_url_redirect'),
+    url(r'^telegrambot/', include('telegrambot.urls')),
 )

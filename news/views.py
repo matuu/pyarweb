@@ -41,12 +41,14 @@ class NewsArticleCreate(CreateView):
 
 
 class NewsArticleDelete(DeleteView, OwnedObject):
+
     """Delete a News."""
     model = NewsArticle
     success_url = reverse_lazy('news_list_all')
 
 
 class NewsArticleUpdate(UpdateView, OwnedObject):
+
     """Updates a NewsArticle."""
     model = NewsArticle
     form_class = NewsArticleForm
@@ -71,8 +73,8 @@ class NewsModerate(DetailView):
     template_name = "news/_new_detail.html"
 
     def get_object(self, queryset=None):
-        #import ipdb; ipdb.set_trace()
-        self.object=super(NewsModerate, self).get_object()
+        # import ipdb; ipdb.set_trace()
+        self.object = super(NewsModerate, self).get_object()
         return self.object
 
 
