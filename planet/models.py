@@ -25,7 +25,7 @@ from django.db.models.signals import pre_delete
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 
-import tagging
+from tagging.registry import register as tagging_register
 from tagging.models import Tag
 
 from planet.managers import (FeedManager, AuthorManager, BlogManager,
@@ -274,7 +274,7 @@ class Post(models.Model):
         return slugify(self.title) or "no-title"
 
 # each Post object now will have got a .tags attribute!
-tagging.register(Post)
+tagging_register(Post)
 
 # Deleting all asociated tags.
 def delete_asociated_tags(sender, **kwargs):

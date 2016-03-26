@@ -150,7 +150,7 @@ def author_detail(request, author_id, tag=None, slug=None):
 
 
 def posts_list(request):
-    posts = Post.site_objects.all().select_related("feed", "blog", "authors")\
+    posts = Post.site_objects.all().select_related("feed__blog")\
         .order_by("-date_modified")
     context = { "posts": posts }
     try:

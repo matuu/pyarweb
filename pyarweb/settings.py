@@ -26,8 +26,6 @@ DEBUG = True
 # Sites framework
 SITE_ID = 1
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
-TEMPLATE_DEBUG = True
 
 # Instead of sending out real emails the console backend just writes
 # the emails that would be sent to the standard output.
@@ -153,22 +151,32 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    # Required by allauth template tags
-    "django.core.context_processors.request",
-    # allauth specific context processors
-    "allauth.account.context_processors.account",
-    "allauth.socialaccount.context_processors.socialaccount",
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': (os.path.join(BASE_DIR, 'templates'),),
+       	'OPTIONS': {
+            'context_processors': [
+				#  allauth specific context processors
+				# "allauth.account.context_processors.account",
+				# "allauth.socialaccount.context_processors.socialaccount",
 
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.media",
-    'django.core.context_processors.static',
-    "django.core.context_processors.request",
-    "django.core.context_processors.i18n",
-    "django.contrib.messages.context_processors.messages",
-    "planet.context_processors.context"
-)
+				"django.contrib.auth.context_processors.auth",
+				"django.core.context_processors.debug",
+				"django.core.context_processors.media",
+				'django.core.context_processors.static',
+				"django.core.context_processors.request",
+				"django.core.context_processors.i18n",
+				"django.contrib.messages.context_processors.messages",
+				"planet.context_processors.context",
+
+                # `allauth` needs this from django
+                'django.template.context_processors.request',
+            ],
+        },
+    },
+]
 
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -207,6 +215,6 @@ WALIKI_INDEX_SLUG = 'Inicio'
 SENDFILE_BACKEND = 'sendfile.backends.simple'
 
 try:
-    from local_settings import *
+    from local_settings import *  # noqa
 except:
     pass
