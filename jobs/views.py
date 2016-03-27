@@ -1,6 +1,7 @@
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.contrib.syndication.views import Feed
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
@@ -8,13 +9,6 @@ from community.views import OwnedObject, FilterableList
 from .models import Job, JobInactivated
 from .forms import JobForm, JobInactivateForm
 from pyarweb.settings import DEFAULT_FROM_EMAIL
-
-
-class JobActiveMixin(object):
-    def get_queryset(self):
-        """ Job must be active """
-        qs = super(JobActiveMixin, self).get_queryset()
-        return qs.actives()
 
 
 class JobsFeed(Feed):
@@ -25,7 +19,7 @@ class JobsFeed(Feed):
     description_template = "jobs/job_detail_feed.html"
 
     def items(self):
-        return Job.objects.order_by('-created')[0:10]
+        return Job.approved_jobs.order_by('-created')[0:10]
 
     def item_title(self, item):
         return item.title
@@ -60,59 +54,43 @@ class JobCreate(CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-        form.instance.is_active = True
+        form.instance.approved = False
         return super(JobCreate, self).form_valid(form)
 
 
-class JobList(ListView, JobActiveMixin, FilterableList):
+class JobDetail(DetailView):
+    model = Job
+
+    def get(self, request, **kwargs):
+        response = super(JobDetail, self).get(request, **kwargs)
+        if not self.object.approved and self.object.owner != self.request.user:
+            return HttpResponseRedirect(reverse_lazy("jobs_list_all"))
+        return response
+
+
+class JobList(ListView, FilterableList):
     model = Job
     paginate_by = 20
 
+    def get_queryset(self):
+        return Job.approved_jobs.all()
 
-class JobUpdate(UpdateView, JobActiveMixin, OwnedObject):
 
+class JobUpdate(UpdateView, OwnedObject):
     """Edit jobs that use Python."""
     model = Job
     form_class = JobForm
 
+    def form_valid(self, form):
+        form.instance.approved = False
+        form.user_moderate = None
+        form.ts_moderate = None
+        return super(JobUpdate, self).form_valid(form)
 
-class JobDelete(DeleteView, JobActiveMixin, OwnedObject):
+
+class JobDelete(DeleteView, OwnedObject):
 
     """Delete a Job."""
     model = Job
     success_url = reverse_lazy('jobs_list_all')
 
-
-class JobInactivate(CreateView):
-    """ Inactivate Job by moderator """
-
-    model = JobInactivated
-    template_name = 'jobs/job_inactivate_form.html'
-    form_class = JobInactivateForm
-
-    def form_valid(self, form):
-        job = Job.objects.get(pk=self.kwargs['pk'])
-        form.instance.job = job
-
-        # -- inactivate job
-        job.is_active = False
-        job.save()
-
-        # -- ¿send mail to job owner?
-        if form.cleaned_data['send_email']:
-            context = {
-                'job_title': job.title,
-                'reason': form.cleaned_data['reason'],
-                'comment': form.cleaned_data['comment']
-            }
-
-            body = render_to_string('jobs/inactivate_job_email.txt', context)
-            email = EmailMessage(
-                subject="[PyAr] Aviso de trabajo dado de baja",
-                to=(job.company.owner.email, ),
-                from_email=DEFAULT_FROM_EMAIL,
-                body=body
-            )
-            email.send()
-
-        return super(JobInactivate, self).form_valid(form)
