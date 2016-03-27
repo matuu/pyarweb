@@ -3,11 +3,12 @@ from telegram.ext import Updater
 from parse import parse
 from django.conf import settings
 from news.models import NewsArticle
+from jobs.models import Job
 from .utils import telegram_fix
 bot = telegram.Bot(token=settings.BOT_TOKEN)
 
 MODERATION_COMMANDS = {"OK": True, "NO": False}
-
+MODEL_DIC = {"noticia": NewsArticle , "trabajo": Job}
 
 def sendMessage(chat_id, text, parse_mode=None, disable_notification=False):
     """Send new Post to Telegram Group."""
@@ -28,12 +29,13 @@ def moderate(request, update=None):
 
     if(validateUpdateData(update)):
         id, username, object_type, link = parseText(update.message.reply_to_message.text)
-        if object_type == "News":
-            NewsArticle.objects.get(pk=id).moderate(
+
+        MODEL_DIC[object_type].objects.get(pk=id).moderate(
                 MODERATION_COMMANDS[update.message.text.strip().upper()],
                 username)
-            broadcast_text = parseToBroadcastText(link, "Nueva Noticia en Pyar")
-            sendMessage(settings.PYAR_GENERAL_CHANNEL, broadcast_text)
+        broadcast_text = parseToBroadcastText(link, object_type + " en Pyar")
+        sendMessage(settings.PYAR_GENERAL_CHANNEL, broadcast_text)
+
         # TODO Difundir noticia a traves del bot con sendMessage
         # con chat_id = canal correspondiente
     else:

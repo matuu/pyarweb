@@ -16,7 +16,7 @@ class NewsArticle(TimeStampedModel):
     body = models.TextField(verbose_name=_('Contenido'))
     owner = models.ForeignKey(User)
     tags = TaggableManager(verbose_name=_('Etiquetas'), blank=True)
-    approve = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False)
     ts_moderate = models.DateTimeField(null=True, blank=True)
     user_moderate = models.TextField(null=True, blank=True)
 
@@ -24,8 +24,8 @@ class NewsArticle(TimeStampedModel):
     def get_absolute_url(self):
         return ('news_view', (self.id,), {})
 
-    def moderate(self, approve, user_moderate):
-        self.approve = approve
+    def moderate(self, approved, user_moderate):
+        self.approved = approved
         self.user_moderate = user_moderate
         self.ts_moderate = datetime.datetime.now()
         self.save()
