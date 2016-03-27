@@ -86,7 +86,7 @@ class JobUpdate(UpdateView, OwnedObject):
         form.instance.approved = False
         form.user_moderate = None
         form.ts_moderate = None
-        return super(JobUpdate, self).form_valid(form)
+        return super(JobCreate, self).form_valid(form)
 
 
 class JobDelete(DeleteView, OwnedObject):
@@ -100,7 +100,3 @@ class JobModerate(DetailView):
     model = Job
     template_name = "jobs/_job_detail.html"
 
-    def get_object(self, queryset=None):
-        # import ipdb; ipdb.set_trace()
-        self.object = super(JobModerate, self).get_object()
-        return self.object

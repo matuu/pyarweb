@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic import ListView, DetailView
@@ -14,7 +15,7 @@ class NewsFeed(Feed):
     description = "Novedades e información de Python Argentina"
 
     def items(self):
-        return NewsArticle.objects.order_by('-created')[0:10]
+        return NewsArticle.approved_news.order_by('-created')[0:10]
 
     def item_title(self, item):
         return item.title
@@ -64,7 +65,7 @@ class NewsArticleList(ListView, FilterableList):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = NewsArticle.objects.filter(approved=True)
+        queryset = NewsArticle.approved_news.all()
         return queryset
 
 
@@ -72,11 +73,13 @@ class NewsModerate(DetailView):
     model = NewsArticle
     template_name = "news/_new_detail.html"
 
-    def get_object(self, queryset=None):
-        # import ipdb; ipdb.set_trace()
-        self.object = super(NewsModerate, self).get_object()
-        return self.object
 
+class NewsDetail(DetailView):
+    model = NewsArticle
 
-
+    def get(self, request, **kwargs):
+        response = super(NewsDetail, self).get(request, **kwargs)
+        if not self.object.approved and self.object.owner != self.request.user:
+            return HttpResponseRedirect(reverse_lazy("news_list_all"))
+        return response
 

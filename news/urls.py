@@ -8,7 +8,8 @@ from .views import (
     NewsArticleList,
     NewsArticleUpdate,
     NewsFeed,
-    NewsModerate
+    NewsModerate,
+    NewsDetail
 )
 
 
@@ -21,7 +22,7 @@ urlpatterns = patterns('',
                            login_required(NewsArticleCreate.as_view()),
                            name='news_add'),
                        url(r'^(?P<pk>\d+)/$',
-                           DetailView.as_view(model=NewsArticle),
+                           NewsDetail.as_view(),
                            name='news_view'),
                        url(r'^(?P<pk>\d+)/delete/$',
                            login_required(NewsArticleDelete.as_view()),

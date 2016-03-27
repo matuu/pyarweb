@@ -11,6 +11,11 @@
 <main id="main" class="container" role="main">
     <div class="col-lg-12">
       <div class="page-header">
+        {% if not object.approved %}
+          <p class="alert alert-warning">
+            {% trans "Su noticia está siendo revisada por los administradores." %}
+          </p>
+        {% endif %}
         <h2>
           {{ object.title }}
           <span class="pull-right">

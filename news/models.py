@@ -6,6 +6,12 @@ from taggit_autosuggest.managers import TaggableManager
 from model_utils.models import TimeStampedModel
 
 
+class ApprovedNewsManager(models.Manager):
+    def get_queryset(self):
+        return super(ApprovedNewsManager, self).get_queryset().filter(
+            approved=True)
+
+
 class NewsArticle(TimeStampedModel):
 
     """A PyAr news article."""
@@ -32,6 +38,9 @@ class NewsArticle(TimeStampedModel):
 
     def __unicode__(self):
         return u'{0}'.format(self.title)
+
+    objects = models.Manager()
+    approved_news = ApprovedNewsManager()
 
     class Meta:
         ordering = ('-created',)
