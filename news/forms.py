@@ -20,4 +20,4 @@ class NewsArticleForm(forms.ModelForm):
 
     class Meta:
         model = NewsArticle
-        exclude = ('approve', 'owner', 'ts_moderate', 'user_moderate')
+        exclude = ('approved', 'owner', 'ts_moderate', 'user_moderate')

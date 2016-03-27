@@ -1,20 +1,28 @@
-import datetime
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-# from pyarweb.settings import PYAR_GENERAL_CHANNEL, PYAR_MODERATION_GROUP
 from news.models import NewsArticle
+from jobs.models import Job
 from telegrambot.pyarbot import parseToText, sendMessage
 
 
 class Command(BaseCommand):
 
+    def generateurl(self, pk, type_model):
+        return "192.168.1.139:8000/" + type_model + "/" + str(pk) + "/moderate"
+
+    def sendmoderate(self, Model, type_model):
+        models = Model.objects.filter(approved=False)
+
+        for model in models:
+            url = self.generateurl(model.pk, type_model)
+            msg = parseToText(str(model.pk), model.owner.username, type_model, url)
+            sendMessage(settings.PYAR_MODERATION_GROUP, msg, parse_mode="Markdown")
+
     def handle(self, *args, **options):
 
-        news = NewsArticle.objects.filter(approve=False)
+        self.sendmoderate(NewsArticle, "noticias")
 
-        for new in news:
-            url = "192.168.1.139:8000/noticias/" + str(new.pk) + "/moderate"
-            msg = parseToText(str(new.pk), new.owner.username, "News", url)
-            sendMessage(settings.PYAR_MODERATION_GROUP, msg, parse_mode="Markdown")
+        self.sendmoderate(Job, "trabajo")
+
 

@@ -64,7 +64,7 @@ class NewsArticleList(ListView, FilterableList):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = NewsArticle.objects.filter(approve=True)
+        queryset = NewsArticle.objects.filter(approved=True)
         return queryset
 
 

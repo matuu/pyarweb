@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from pycompanies.models import Company
 from taggit_autosuggest.managers import TaggableManager
 from model_utils.models import TimeStampedModel
+import datetime
 
 JOB_SENIORITIES = (
     ('Trainee', 'Trainee'),
@@ -49,8 +50,8 @@ class Job(models.Model):
     ts_moderate = models.DateTimeField(null=True, blank=True)
     user_moderate = models.TextField(null=True, blank=True)
 
-    def moderate(self, approve, user_moderate):
-        self.approve = approve
+    def moderate(self, approved, user_moderate):
+        self.approved = approved
         self.user_moderate = user_moderate
         self.ts_moderate = datetime.datetime.now()
         self.save()
