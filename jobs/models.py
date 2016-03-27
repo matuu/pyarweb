@@ -15,11 +15,9 @@ JOB_SENIORITIES = (
 )
 
 
-class JobQuerySet(models.QuerySet):
-
-    def actives(self):
-        # -- only active records
-        return self.filter(is_active=True)
+class ApprovedJobManager(models.Manager):
+    def get_queryset(self):
+        return super(ApprovedJobManager, self).get_queryset().filter(approved=True)
 
 
 class Job(models.Model):
@@ -47,9 +45,18 @@ class Job(models.Model):
         choices=JOB_SENIORITIES,
         verbose_name=_('Experiencia'))
     slug = AutoSlugField(populate_from='title', unique=True)
-    is_active = models.BooleanField(default=True)
+    approved = models.BooleanField(default=False)
+    ts_moderate = models.DateTimeField(null=True, blank=True)
+    user_moderate = models.TextField(null=True, blank=True)
 
-    objects = JobQuerySet.as_manager()
+    def moderate(self, approve, user_moderate):
+        self.approve = approve
+        self.user_moderate = user_moderate
+        self.ts_moderate = datetime.datetime.now()
+        self.save()
+
+    objects = models.Manager()
+    approved_jobs = ApprovedJobManager()
 
     def __str__(self):
         return u'{0}'.format(self.title)
@@ -88,5 +95,4 @@ class JobInactivated(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse('jobs_list_all')
-
 

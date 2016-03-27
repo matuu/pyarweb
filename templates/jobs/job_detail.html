@@ -14,6 +14,9 @@
     <div class="col-lg-12">
 
       <div class="page-header">
+        {% if not object.approved %}
+          <p class="alert alert-warning">{% trans "Su oferta está siendo evaluada por los administradores" %}<p>
+        {% endif %}
         <h2>{{ object.title }}
           <span class="pull-right">
             {% if object.owner == user %}
