@@ -4,15 +4,7 @@
 <div class="container">
     <h3 class="title">{{ object.title}}</h3>
     <div class="well well-sm">
-        <p>
-            {{ object.introduction }}
-        </p>
-    </div>
-    <div class="panel panel-info">
-        <div class="panel-heading">Body</div>
-        <div class="panel-body">
-            {{ object.body|safe }}
-        </div>
+        {{ object.description|safe}}
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Usuario</div>

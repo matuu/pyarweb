@@ -77,6 +77,7 @@ class JobList(ListView, FilterableList):
 
 
 class JobUpdate(UpdateView, OwnedObject):
+
     """Edit jobs that use Python."""
     model = Job
     form_class = JobForm
@@ -94,3 +95,12 @@ class JobDelete(DeleteView, OwnedObject):
     model = Job
     success_url = reverse_lazy('jobs_list_all')
 
+
+class JobModerate(DetailView):
+    model = Job
+    template_name = "jobs/_job_detail.html"
+
+    def get_object(self, queryset=None):
+        # import ipdb; ipdb.set_trace()
+        self.object = super(JobModerate, self).get_object()
+        return self.object

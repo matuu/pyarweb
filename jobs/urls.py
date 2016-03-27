@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView
 from django.conf.urls import patterns, url
 from .models import Job
 from .views import (JobCreate, JobList, JobDelete, JobUpdate,
-                    JobsFeed, JobDetail)
+                    JobsFeed, JobDetail, JobModerate)
 
 
 urlpatterns = patterns('',
@@ -19,7 +19,7 @@ urlpatterns = patterns('',
                        url(r'^(?P<pk>\d+)/update/$',
                            login_required(JobUpdate.as_view()),
                            name='jobs_update'),
+                       url(r'^(?P<pk>\d+)/moderate$',
+                           JobModerate.as_view(),
+                           name='jobs_moderate'),
 )
-
-
-
