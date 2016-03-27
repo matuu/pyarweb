@@ -2,8 +2,9 @@ import telegram
 from telegram.ext import Updater
 from parse import parse
 from django.conf import settings
+# from pyarweb.settings import BOT_TOKEN, PYAR_MODERATION_GROUP
 from news.models import NewsArticle
-from .utils import telegram_fix
+
 bot = telegram.Bot(token=settings.BOT_TOKEN)
 
 MODERATION_COMMANDS = {"OK": True, "NO": False}
@@ -20,20 +21,14 @@ def sendMessage(chat_id, text, parse_mode=None, disable_notification=False):
                        "disable_notification": disable_notification})
 
 
-def moderate(request, update=None):
+def moderate(request):
     """Apply moderation and send result to Telegram Group."""
-    if(update is None):
-        data = telegram_fix(request)
-        update = telegram.Update.de_json(data)
-
+    update = telegram.Update.de_json(request.get_json(force=True))
     if(validateUpdateData(update)):
-        id, username, object_type, link = parseText(update.message.reply_to_message.text)
+        id, username, object_type, text = parseText(update.message.reply_to_message.text)
         if object_type == "News":
-            NewsArticle.objects.get(pk=id).moderate(
-                MODERATION_COMMANDS[update.message.text.strip().upper()],
-                username)
-            broadcast_text = parseToBroadcastText(link, "Nueva Noticia en Pyar")
-            sendMessage(settings.PYAR_GENERAL_CHANNEL, broadcast_text)
+            NewsArticle.objects.get(pk=id).moderate(MODERATION_COMMANDS[text],
+                                                    username)
         # TODO Difundir noticia a traves del bot con sendMessage
         # con chat_id = canal correspondiente
     else:
@@ -49,18 +44,12 @@ def validateUpdateData(update):
         return False
     if update.message.chat.id != settings.PYAR_MODERATION_GROUP:
         return False
-    if update.message.reply_to_message is None:
+    if update.message.reply_to_message is not None:
         return False
-    if update.message.text.strip().upper() not in MODERATION_COMMANDS:
+    if update.message.text.strip.upper() not in MODERATION_COMMANDS:
         return False
 
     return True
-
-
-def parseToBroadcastText(link, title):
-    """Create a Text for broadcast."""
-    return "{title}\n{link}".format(**{"title": title,
-                                       "link": link})
 
 
 def parseToText(id_post, username, object_type, post_link):

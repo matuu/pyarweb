@@ -30,6 +30,7 @@ urlpatterns = patterns(
     url(r'^tutoring/', include('tutoring.urls')),
 
     url(r'^$', 'community.views.homepage', name='homepage'),
+    url(r'^telegrambot/$', include('telegrambot.urls'), name="telegram"),
     url(r'^aprendiendo-python/', 'community.views.learning', name='aprendiendo'),
     url(r'^nosotros/', 'community.views.about_pyar', name='about_pyar'),
     url(r'^miembros/', 'community.views.members', name='pyar_members'),
@@ -47,5 +48,4 @@ urlpatterns = patterns(
     url(r'^wiki/', include('waliki.urls')),
     url(r'^(pyar/)?(?P<slug>' + WALIKI_SLUG_PATTERN + ')/?',
         old_url_redirect, name='old_url_redirect'),
-    url(r'^telegrambot/', include('telegrambot.urls')),
 )

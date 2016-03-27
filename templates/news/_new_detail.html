@@ -1,5 +1,12 @@
-{{ object.title}}
-{{ object.introduction }}
-{{ object.body|safe }}
-{{ object.owner }}
-
+<div>
+    <span class="title">{{ object.title}}</span>
+    <div class="intro">
+        <p>
+            {{ object.introduction }}
+        </p>
+    </div>
+    <div class="body">
+        {{ object.body|safe }}
+    </div>
+    <span class="owner">{{ object.owner }}</span>
+</div>
