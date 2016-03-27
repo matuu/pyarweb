@@ -1,3 +1,5 @@
+from django.db import models
+from django.utils import timezone
 from allauth.account.signals import user_signed_up
 from waliki.models import ACLRule
 from django.contrib.auth.models import Permission
@@ -21,3 +23,19 @@ def create_acl_for_user_wiki_own_page(sender, **kwargs):
     if created:
         rule.permissions.add(*perms)
         rule.users.add(user)
+
+
+class ModerateModel(models.Model):
+
+    approved = models.BooleanField(default=False)
+    ts_moderate = models.DateTimeField(null=True, blank=True)
+    user_moderate = models.TextField(null=True, blank=True)
+
+    def moderate(self, approved, user_moderate):
+        self.approved = approved
+        self.user_moderate = user_moderate
+        self.ts_moderate = timezone.now()
+        self.save()
+
+    class Meta:
+        abstract = True

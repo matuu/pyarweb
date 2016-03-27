@@ -3,10 +3,12 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext as _
-from pycompanies.models import Company
 from taggit_autosuggest.managers import TaggableManager
 from model_utils.models import TimeStampedModel
-import datetime
+
+from pycompanies.models import Company
+from community.models import ModerateModel
+
 
 JOB_SENIORITIES = (
     ('Trainee', 'Trainee'),
@@ -21,7 +23,7 @@ class ApprovedJobManager(models.Manager):
         return super(ApprovedJobManager, self).get_queryset().filter(approved=True)
 
 
-class Job(models.Model):
+class Job(ModerateModel):
     """A PyAr Job."""
 
     title = models.CharField(max_length=255, verbose_name=_('Título'))
@@ -46,15 +48,6 @@ class Job(models.Model):
         choices=JOB_SENIORITIES,
         verbose_name=_('Experiencia'))
     slug = AutoSlugField(populate_from='title', unique=True)
-    approved = models.BooleanField(default=False)
-    ts_moderate = models.DateTimeField(null=True, blank=True)
-    user_moderate = models.TextField(null=True, blank=True)
-
-    def moderate(self, approved, user_moderate):
-        self.approved = approved
-        self.user_moderate = user_moderate
-        self.ts_moderate = datetime.datetime.now()
-        self.save()
 
     objects = models.Manager()
     approved_jobs = ApprovedJobManager()
