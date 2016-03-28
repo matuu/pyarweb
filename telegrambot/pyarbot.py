@@ -8,7 +8,7 @@ from .utils import telegram_fix
 bot = telegram.Bot(token=settings.BOT_TOKEN)
 
 MODERATION_COMMANDS = {"OK": True, "NO": False}
-MODEL_DIC = {"noticia": NewsArticle , "trabajo": Job}
+MODEL_DIC = {"noticia": NewsArticle, "trabajo": Job}
 
 def sendMessage(chat_id, text, parse_mode=None, disable_notification=False):
     """Send new Post to Telegram Group."""
@@ -38,7 +38,6 @@ def moderate(request, update=None):
 
         # TODO Difundir noticia a traves del bot con sendMessage
         # con chat_id = canal correspondiente
-    else:
         bot.sendMessage(chat_id=update.message.chat.id,
                         text="Generic error for now")
 
